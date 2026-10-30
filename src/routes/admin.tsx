@@ -95,7 +95,7 @@ function Admin() {
               {spots.map(([area, n]) => (
                 <li key={area} className="text-sm">
                   <div className="flex justify-between"><span>{area}</span><b>{n}</b></div>
-                  <div className="mt-1 h-1.5 rounded-full bg-muted"><div className="h-1.5 rounded-full bg-gradient-brand" style={{ width: `${(n / spots[0][1]) * 100}%` }} /></div>
+                  <div className="mt-1 h-1.5 rounded-full bg-muted"><div className="h-1.5 rounded-full bg-gradient-brand" style={{ width: `${(n / (spots[0]?.[1] ?? 1)) * 100}%` }} /></div>
                 </li>
               ))}
             </ul>

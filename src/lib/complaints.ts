@@ -34,7 +34,7 @@ export interface Complaint {
   description: string;
   category: Category;
   location: string;
-  image?: string;
+  image?: string | undefined;
   createdAt: string;
   status: Status;
   team: Team;
@@ -166,7 +166,7 @@ export function saveComplaints(list: Complaint[]): boolean {
 }
 
 export function nextId(list: Complaint[]): string {
-  const max = list.reduce((m, c) => Math.max(m, parseInt(c.id.split("-")[1]) || 1000), 1000);
+  const max = list.reduce((m, c) => Math.max(m, parseInt(c.id.split("-")[1] ?? "") || 1000), 1000);
   return `CIV-${max + 1}`;
 }
 
@@ -227,7 +227,7 @@ export function analyze(c: Complaint, all: Complaint[]) {
   }
   const days = Math.floor((Date.now() - new Date(c.createdAt).getTime()) / 86400000);
   const dayMatch = text.match(/(\d+)\s*(day|week)/);
-  const ongoing = dayMatch ? parseInt(dayMatch[1]) * (dayMatch[2] === "week" ? 7 : 1) : 0;
+  const ongoing = dayMatch ? parseInt(dayMatch[1] ?? "0") * (dayMatch[2] === "week" ? 7 : 1) : 0;
   if (ongoing >= 3) {
     score += 10;
     reasons.push(`problem ongoing for ${ongoing}+ days`);
@@ -254,7 +254,7 @@ export function analyze(c: Complaint, all: Complaint[]) {
   score = Math.max(0, Math.min(100, score));
   const level = score >= 70 ? "High" : score >= 45 ? "Medium" : "Low";
 
-  const firstSentence = c.description.split(/(?<=[.!?])\s/)[0];
+  const firstSentence = c.description.split(/(?<=[.!?])\s/)[0] ?? c.description;
   const summary = `${detected} issue at ${c.location}: ${firstSentence}`;
 
   return {
@@ -273,7 +273,7 @@ export function analyze(c: Complaint, all: Complaint[]) {
 export function hotspots(list: Complaint[]) {
   const map = new Map<string, number>();
   for (const c of list) {
-    const ward = c.location.match(/ward\s*\d+/i)?.[0] ?? c.location.split(",")[0];
+    const ward = c.location.match(/ward\s*\d+/i)?.[0] ?? c.location.split(",")[0] ?? c.location;
     map.set(ward, (map.get(ward) ?? 0) + 1);
   }
   return [...map.entries()].sort((a, b) => b[1] - a[1]);

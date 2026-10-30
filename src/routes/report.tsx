@@ -33,7 +33,7 @@ function Report() {
   const [form, setForm] = useState({ title: "", description: "", category: "", location: "" });
   const [image, setImage] = useState<string>();
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [result, setResult] = useState<{ ok: boolean; id?: string }>();
+  const [result, setResult] = useState<{ ok: boolean; id?: string | undefined }>();
 
   const onImage = (f?: File) => {
     if (!f) return setImage(undefined);
