@@ -16,7 +16,7 @@ export function Logo() {
       <span className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-primary-foreground">
         <ShieldCheck className="h-5 w-5" />
       </span>
-      Civic<span className="text-accent">AI</span>
+      <span>Civic<span className="text-accent">AI</span></span>
     </Link>
   );
 }
