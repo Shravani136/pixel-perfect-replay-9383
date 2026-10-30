@@ -9,7 +9,7 @@ export const CATEGORIES = [
 ] as const;
 export type Category = (typeof CATEGORIES)[number];
 
-export const STATUSES = ["Pending", "In Progress", "Resolved"] as const;
+export const STATUSES = ["Submitted", "Pending", "In Progress", "Resolved"] as const;
 export type Status = (typeof STATUSES)[number];
 
 export const TEAMS = [
@@ -155,14 +155,30 @@ export function loadComplaints(): Complaint[] {
   }
 }
 
-/** Returns true only if the write actually succeeded. */
-export function saveComplaints(list: Complaint[]): boolean {
+export type SaveResult = { ok: true } | { ok: false; error: string };
+
+/** Writes to this browser's storage and reads back to confirm. */
+export function saveComplaints(list: Complaint[]): SaveResult {
   try {
+    if (typeof window === "undefined" || !window.localStorage)
+      return { ok: false, error: "Storage is not available in this browser." };
     localStorage.setItem(KEY, JSON.stringify(list));
-    return JSON.parse(localStorage.getItem(KEY) ?? "[]").length === list.length;
-  } catch {
-    return false;
+    const back = JSON.parse(localStorage.getItem(KEY) ?? "[]") as Complaint[];
+    if (back.length !== list.length) return { ok: false, error: "Save could not be confirmed. Please try again." };
+    return { ok: true };
+  } catch (e) {
+    if (e instanceof DOMException && (e.name === "QuotaExceededError" || e.code === 22))
+      return { ok: false, error: "Not enough storage space. Try a smaller photo or remove the photo." };
+    return { ok: false, error: "Something went wrong while saving. Please try again." };
   }
+}
+
+/** Unique ID: sequential number, guaranteed not already used. */
+export function uniqueId(list: Complaint[]): string {
+  const used = new Set(list.map((c) => c.id));
+  let id = nextId(list);
+  while (used.has(id)) id = `CIV-${parseInt(id.split("-")[1] ?? "1000") + 1}`;
+  return id;
 }
 
 export function nextId(list: Complaint[]): string {
@@ -173,7 +189,7 @@ export function nextId(list: Complaint[]): string {
 export function stats(list: Complaint[]) {
   return {
     total: list.length,
-    pending: list.filter((c) => c.status === "Pending").length,
+    pending: list.filter((c) => c.status === "Pending" || c.status === "Submitted").length,
     inProgress: list.filter((c) => c.status === "In Progress").length,
     resolved: list.filter((c) => c.status === "Resolved").length,
   };

@@ -49,8 +49,9 @@ function Admin() {
     const next = list.map((x) =>
       x.id === c.id ? { ...x, status, team, history: [...x.history, { date: new Date().toISOString(), status, note: msg.slice(0, 300) }] } : x,
     );
-    if (commit(next)) { toast.success("Complaint updated"); setNote(""); }
-    else toast.error("Update failed — not saved");
+    const res = commit(next);
+    if (res.ok) { toast.success("Complaint updated"); setNote(""); }
+    else toast.error(`Update failed: ${res.error}`);
   };
 
   return (

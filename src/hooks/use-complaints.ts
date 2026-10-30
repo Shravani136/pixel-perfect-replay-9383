@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { loadComplaints, saveComplaints, type Complaint } from "@/lib/complaints";
+import { loadComplaints, saveComplaints, type Complaint, type SaveResult } from "@/lib/complaints";
 
 export function useComplaints() {
   const [list, setList] = useState<Complaint[]>([]);
@@ -11,9 +11,9 @@ export function useComplaints() {
   }, []);
 
   const commit = useCallback((next: Complaint[]) => {
-    const ok = saveComplaints(next);
-    if (ok) setList(next);
-    return ok;
+    const res: SaveResult = saveComplaints(next);
+    if (res.ok) setList(next);
+    return res;
   }, []);
 
   return { list, ready, commit };
