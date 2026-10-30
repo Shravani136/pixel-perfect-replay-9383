@@ -80,7 +80,7 @@ export function StatCards({ s }: { s: { total: number; pending: number; inProgre
 }
 
 export function StatusBadge({ status }: { status: Status }) {
-  const cls = status === "Resolved" ? "badge-success" : status === "In Progress" ? "badge-accent" : "badge-warning";
+  const cls = status === "Resolved" ? "badge-success" : status === "In Progress" ? "badge-accent"       : status === "Submitted" ? "badge-muted" : "badge-warning";
   return <span className={`badge ${cls}`}>{status}</span>;
 }
 
